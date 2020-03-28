@@ -8,7 +8,6 @@ __all__ = ['setDefaults', 'CONFIRMED', 'DEATHS', 'RECOVERED', 'getToday', 'getYe
 # Cell
 import typing
 from typing import List, Callable
-import pandas as pd
 import requests
 import datetime
 from datetime import date
@@ -18,6 +17,7 @@ from io import StringIO
 import urllib.request
 import matplotlib.pyplot as plt
 import seaborn as sns
+import pandas as pd
 
 # Cell
 def setDefaults(figsize=(18,6)):
