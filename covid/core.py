@@ -59,7 +59,7 @@ def procDataframe(csv: str) -> pd.DataFrame:
 
 def procUrl(url: str, download: bool, localfile: str=None, force: bool=False, verbose: bool=False) -> pd.DataFrame:
     ''' Optionally download then process csv data or file at url converting it to a pandas dataframe. '''
-    assert(len(url))
+    assert(url)
     if download:
         if os.path.exists(localfile) and not force:
             verbose and print(f'"{localfile}" already exists so will not overwrite')
