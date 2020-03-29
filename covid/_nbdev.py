@@ -11,8 +11,8 @@ index = {"setDefaults": "00_core.ipynb",
          "getYesterday": "00_core.ipynb",
          "procDataframe": "00_core.ipynb",
          "procUrl": "00_core.ipynb",
-         "getDailyReport": "00_core.ipynb",
-         "plotDailyReport": "00_core.ipynb",
+         "getCountriesDailyReport": "00_core.ipynb",
+         "plotCountriesDailyReport": "00_core.ipynb",
          "getTimeSeriesConfirmed": "00_core.ipynb",
          "getTimeSeriesDeaths": "00_core.ipynb",
          "getTimeSeriesRecovered": "00_core.ipynb",
@@ -20,8 +20,9 @@ index = {"setDefaults": "00_core.ipynb",
          "procTimeSeries": "00_core.ipynb",
          "procTimeSeriesDeaths": "00_core.ipynb",
          "procTimeSeriesConfirmed": "00_core.ipynb",
-         "procTimeSeriesRecovered": "00_core.ipynb",
-         "plotCountryTimeSeries": "00_core.ipynb"}
+         "plotCountryTimeSeries": "00_core.ipynb",
+         "plotCountriesDailyReportFromAPI": "00_core.ipynb",
+         "plotCategoryByCountry": "00_core.ipynb"}
 
 modules = ["core.py"]
 
