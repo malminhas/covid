@@ -40,128 +40,31 @@ n = 5
 nrows,ncols = df.shape
 print(f'df has {nrows} rows and {ncols} columns with column names {df.columns.to_list()}')
 print(f'First {n} rows are:')
-df.iloc[:n,:]
+print(df.iloc[:n,:])
 ```
 
     df has 3430 rows and 12 columns with column names ['FIPS', 'Admin2', 'Province_State', 'Country_Region', 'Last_Update', 'Lat', 'Long_', 'Confirmed', 'Deaths', 'Recovered', 'Active', 'Combined_Key']
     First 5 rows are:
-
-
-
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>FIPS</th>
-      <th>Admin2</th>
-      <th>Province_State</th>
-      <th>Country_Region</th>
-      <th>Last_Update</th>
-      <th>Lat</th>
-      <th>Long_</th>
-      <th>Confirmed</th>
-      <th>Deaths</th>
-      <th>Recovered</th>
-      <th>Active</th>
-      <th>Combined_Key</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>45001.0</td>
-      <td>Abbeville</td>
-      <td>South Carolina</td>
-      <td>US</td>
-      <td>2020-03-28 23:05:37</td>
-      <td>34.223334</td>
-      <td>-82.461707</td>
-      <td>3</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>Abbeville, South Carolina, US</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>22001.0</td>
-      <td>Acadia</td>
-      <td>Louisiana</td>
-      <td>US</td>
-      <td>2020-03-28 23:05:37</td>
-      <td>30.295065</td>
-      <td>-92.414197</td>
-      <td>9</td>
-      <td>1</td>
-      <td>0</td>
-      <td>0</td>
-      <td>Acadia, Louisiana, US</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>51001.0</td>
-      <td>Accomack</td>
-      <td>Virginia</td>
-      <td>US</td>
-      <td>2020-03-28 23:05:37</td>
-      <td>37.767072</td>
-      <td>-75.632346</td>
-      <td>2</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>Accomack, Virginia, US</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>16001.0</td>
-      <td>Ada</td>
-      <td>Idaho</td>
-      <td>US</td>
-      <td>2020-03-28 23:05:37</td>
-      <td>43.452658</td>
-      <td>-116.241552</td>
-      <td>76</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>Ada, Idaho, US</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>19001.0</td>
-      <td>Adair</td>
-      <td>Iowa</td>
-      <td>US</td>
-      <td>2020-03-28 23:05:37</td>
-      <td>41.330756</td>
-      <td>-94.471059</td>
-      <td>1</td>
-      <td>0</td>
-      <td>0</td>
-      <td>0</td>
-      <td>Adair, Iowa, US</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
+          FIPS     Admin2  Province_State Country_Region         Last_Update  \
+    0  45001.0  Abbeville  South Carolina             US 2020-03-28 23:05:37   
+    1  22001.0     Acadia       Louisiana             US 2020-03-28 23:05:37   
+    2  51001.0   Accomack        Virginia             US 2020-03-28 23:05:37   
+    3  16001.0        Ada           Idaho             US 2020-03-28 23:05:37   
+    4  19001.0      Adair            Iowa             US 2020-03-28 23:05:37   
+    
+             Lat       Long_  Confirmed  Deaths  Recovered  Active  \
+    0  34.223334  -82.461707          3       0          0       0   
+    1  30.295065  -92.414197          9       1          0       0   
+    2  37.767072  -75.632346          2       0          0       0   
+    3  43.452658 -116.241552         76       0          0       0   
+    4  41.330756  -94.471059          1       0          0       0   
+    
+                        Combined_Key  
+    0  Abbeville, South Carolina, US  
+    1          Acadia, Louisiana, US  
+    2         Accomack, Virginia, US  
+    3                 Ada, Idaho, US  
+    4                Adair, Iowa, US  
 
 
 You can plot this data aggregated by country and `kind` as follows.  Note here that `setDefaults` configures graphs to be drawn using the [seaborn](https://seaborn.pydata.org/introduction.html) visualisation library:

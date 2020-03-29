@@ -145,7 +145,7 @@ def plotCountryTimeSeries(df: pd.DataFrame, countries: List, kind: str) -> None:
     plt.show()
 
 # Cell
-def plotCountriesDailyReportFromAPI(normalised=True):
+def plotCountriesDailyReportFromAPI(normalised=False):
     url = 'https://api.covid19api.com/summary'
     if normalised:
         df = pd.DataFrame(requests.get(url).json().get('Countries'))
