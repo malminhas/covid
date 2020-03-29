@@ -3,6 +3,7 @@
 __all__ = ["index", "modules", "custom_doc_links", "git_url"]
 
 index = {"setDefaults": "00_core.ipynb",
+         "ROOT": "00_core.ipynb",
          "CONFIRMED": "00_core.ipynb",
          "DEATHS": "00_core.ipynb",
          "RECOVERED": "00_core.ipynb",
