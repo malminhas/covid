@@ -36,46 +36,42 @@ df = getCountriesDailyReport(getYesterday())
 You can view the structure of `df` as follows:
 
 ```python
-n = 5
+n = 1
 nrows,ncols = df.shape
 print(f'df has {nrows} rows and {ncols} columns with column names {df.columns.to_list()}')
 print(f'First {n} rows are:')
 print(df.iloc[:n,:])
 ```
 
-    df has 3430 rows and 12 columns with column names ['FIPS', 'Admin2', 'Province_State', 'Country_Region', 'Last_Update', 'Lat', 'Long_', 'Confirmed', 'Deaths', 'Recovered', 'Active', 'Combined_Key']
-    First 5 rows are:
+    df has 3434 rows and 12 columns with column names ['FIPS', 'Admin2', 'Province_State', 'Country_Region', 'Last_Update', 'Lat', 'Long_', 'Confirmed', 'Deaths', 'Recovered', 'Active', 'Combined_Key']
+    First 1 rows are:
           FIPS     Admin2  Province_State Country_Region         Last_Update  \
-    0  45001.0  Abbeville  South Carolina             US 2020-03-28 23:05:37   
-    1  22001.0     Acadia       Louisiana             US 2020-03-28 23:05:37   
-    2  51001.0   Accomack        Virginia             US 2020-03-28 23:05:37   
-    3  16001.0        Ada           Idaho             US 2020-03-28 23:05:37   
-    4  19001.0      Adair            Iowa             US 2020-03-28 23:05:37   
+    0  45001.0  Abbeville  South Carolina             US 2020-03-29 23:08:25   
     
-             Lat       Long_  Confirmed  Deaths  Recovered  Active  \
-    0  34.223334  -82.461707          3       0          0       0   
-    1  30.295065  -92.414197          9       1          0       0   
-    2  37.767072  -75.632346          2       0          0       0   
-    3  43.452658 -116.241552         76       0          0       0   
-    4  41.330756  -94.471059          1       0          0       0   
+             Lat      Long_  Confirmed  Deaths  Recovered  Active  \
+    0  34.223334 -82.461707          3       0          0       0   
     
                         Combined_Key  
     0  Abbeville, South Carolina, US  
-    1          Acadia, Louisiana, US  
-    2         Accomack, Virginia, US  
-    3                 Ada, Idaho, US  
-    4                Adair, Iowa, US  
 
 
 You can plot this data aggregated by country and `kind` as follows.  Note here that `setDefaults` configures graphs to be drawn using the [seaborn](https://seaborn.pydata.org/introduction.html) visualisation library:
 
 ```python
 setDefaults()
-plotCountriesDailyReport(getCountriesDailyReport(getYesterday()), color='r', kind='Deaths')
+plotCountriesDailyReport(getCountriesDailyReport(getYesterday()), topN=15, color='r', kind='Deaths')
 ```
 
 
 ![png](docs/images/output_11_0.png)
+
+
+```python
+plotCountryDailyReport(getCountriesDailyReport(getYesterday()), 'US',  topN=15, color='r', kind='Deaths')
+```
+
+
+![png](docs/images/output_12_0.png)
 
 
 ## 4. Graphing time series counts <a name="covid-timeseries"></a>
@@ -90,28 +86,28 @@ ddf = df.groupby('country')['Confirmed'].count().sort_values(ascending=True)
 print(f'max={ddf.max()}, min={ddf.min()}, count={len(ddf)}')
 ```
 
-    Found (11859, 2) (rows, cols) of cols=['country' 'Confirmed']
-    max=67, min=67, count=177
+    Found (12036, 2) (rows, cols) of cols=['country' 'Confirmed']
+    max=68, min=68, count=177
 
 
 Now we can plot a time series of confirmed cases of Covid-19 in China, Italy, US and UK as follows:
 
 ```python
-plotCountryTimeSeries(df, ['China', 'Italy', 'US', 'United Kingdom'], 'Confirmed')
+plotCountriesTimeSeries(df, ['China', 'Italy', 'US', 'United Kingdom'], 'Confirmed')
 ```
 
 
-![png](docs/images/output_16_0.png)
+![png](docs/images/output_17_0.png)
 
 
 And we can plot a time series of recorded deaths in these same countries as follows:
 
 ```python
-plotCountryTimeSeries(procTimeSeriesDeaths(), ['China', 'Italy', 'US', 'United Kingdom'], 'Deaths')
+plotCountriesTimeSeries(procTimeSeriesDeaths(), ['China', 'Italy', 'US', 'United Kingdom'], 'Deaths')
 ```
 
 
-![png](docs/images/output_18_0.png)
+![png](docs/images/output_19_0.png)
 
 
 ## 5. Graphing current and time series counts using Covid API <a name="covid-api"></a>
@@ -124,7 +120,7 @@ plotCountriesDailyReportFromAPI()
 ```
 
 
-![png](docs/images/output_21_0.png)
+![png](docs/images/output_22_0.png)
 
 
 Note that not all the country names are fully normalised - Iran and South Korea appear twice.  You can normalise the data by passing in a `normalise=True` flag:
@@ -134,7 +130,7 @@ plotCountriesDailyReportFromAPI(normalised=True)
 ```
 
 
-![png](docs/images/output_23_0.png)
+![png](docs/images/output_24_0.png)
 
 
 It's also possible to do timeseries representation using this API by country:
@@ -144,7 +140,7 @@ plotCategoryByCountry('Confirmed', 'united-kingdom')
 ```
 
 
-![png](docs/images/output_25_0.png)
+![png](docs/images/output_26_0.png)
 
 
 ```python
@@ -152,5 +148,13 @@ plotCategoryByCountry('Deaths', 'united-kingdom', color='r')
 ```
 
 
-![png](docs/images/output_26_0.png)
+![png](docs/images/output_27_0.png)
+
+
+```python
+plotCategoryByCountry('Deaths', 'us', color='r')
+```
+
+
+![png](docs/images/output_28_0.png)
 
