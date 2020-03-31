@@ -4,7 +4,8 @@ __all__ = ['setDefaults', 'ROOT', 'CONFIRMED', 'DEATHS', 'RECOVERED', 'getToday'
            'procUrl', 'getCountriesDailyReport', 'plotCountriesDailyReport', 'plotCountryDailyReport',
            'getTimeSeriesConfirmed', 'getTimeSeriesDeaths', 'getTimeSeriesRecovered', 'procTimeSeriesDataframe',
            'procTimeSeries', 'procTimeSeriesDeaths', 'procTimeSeriesConfirmed', 'plotCountriesTimeSeries',
-           'plotCountriesDailyReportFromAPI', 'plotCategoryByCountry']
+           'getCountriesDailyReportFromAPI', 'plotCountriesDailyReportFromAPI', 'getCategoryByCountryFromAPI',
+           'plotCategoryByCountryFromAPI']
 
 # Cell
 import typing
@@ -19,6 +20,7 @@ import urllib.request
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
+import altair as alt
 
 # Cell
 def setDefaults(figsize=(18,9)):
@@ -79,21 +81,59 @@ def getCountriesDailyReport(day: str, download: bool=False, force: bool=False) -
     localfile = f'{day}.csv'
     return procUrl(url, download, localfile, force)
 
-def plotCountriesDailyReport(df: pd.DataFrame, topN: int=10, color: str='y', kind: str='Confirmed') -> None:
-    fig, ax = plt.subplots()
-    ax = df.groupby('Country_Region')[kind].sum().sort_values(ascending=False)[:topN].\
-      plot(ax=ax, kind='bar', color=color, stacked=False, figsize=(18,9))
-    ax.set_ylabel(kind, size=14)
-    ax.set_xlabel('Country', size=14)
-    ax.set_title(f'Total {kind} by top {topN} countries as of {getYesterday()}', size=18)
-    plt.show()
+def plotCountriesDailyReport(df: pd.DataFrame, topN: int=10, color: str='y', kind: str='Confirmed', visualisation: str='matplotlib') -> None:
+    if visualisation == 'altair':
+        sdf = df.groupby('Country_Region')[kind].sum().sort_values(ascending=False)[:topN]
+        keys = sdf.keys().to_list()
+        vals = sdf.to_list()
+        data = []
+        for k,v in zip(keys,vals):
+            data.append({'Country':k, kind: v})
+        sdf = pd.DataFrame(data)
+        bar_chart = alt.Chart(sdf).mark_bar(size=30).encode(
+            x=alt.X('Country',sort='-y'),
+            y=kind,
+            color=alt.value(color),
+            opacity=alt.value(0.9),
+        ).properties(
+            width=1000,
+            height=450
+        )
+        bar_chart.display()
+    else:
+        fig, ax = plt.subplots()
+        ax = df.groupby('Country_Region')[kind].sum().sort_values(ascending=False)[:topN].\
+          plot(ax=ax, kind='bar', color=color, stacked=False, figsize=(18,9))
+        ax.set_ylabel(kind, size=14)
+        ax.set_xlabel('Country', size=14)
+        ax.set_title(f'Total {kind} by top {topN} countries as of {getYesterday()}', size=18)
+        plt.show()
 
-def plotCountryDailyReport(df: pd.DataFrame, country: str, topN: int=10, color: str='y', kind: str='Confirmed') -> None:
-    ax = df[df['Country_Region'] == country].groupby('Province_State')[kind].sum().sort_values(ascending=False)[:topN].\
-      plot(kind='bar', color=color, stacked=False, figsize=(18,9))
-    ax.set_ylabel(kind, size=14)
-    ax.set_xlabel('Country', size=14)
-    ax.set_title(f'Total {kind} for top {topN} regions of {country} as of {getYesterday()}', size=18)
+def plotCountryDailyReport(df: pd.DataFrame, country: str, topN: int=10, color: str='orange', kind: str='Confirmed', visualisation: str='matplotlib') -> None:
+    if visualisation == 'altair':
+        sdf = df[df['Country_Region'] == country].groupby('Province_State')[kind].sum().sort_values(ascending=False)[:topN]
+        keys = sdf.keys().to_list()
+        vals = sdf.to_list()
+        data = []
+        for k,v in zip(keys,vals):
+            data.append({'Province_State':k, kind: v})
+        sdf = pd.DataFrame(data)
+        bar_chart = alt.Chart(sdf).mark_bar(size=30).encode(
+            x=alt.X('Province_State',sort='-y'),
+            y=kind,
+            color=alt.value(color),
+            opacity=alt.value(0.9),
+        ).properties(
+            width=1000,
+            height=450
+        )
+        bar_chart.display()
+    else:
+        ax = df[df['Country_Region'] == country].groupby('Province_State')[kind].sum().sort_values(ascending=False)[:topN].\
+          plot(kind='bar', color=color, stacked=False, figsize=(18,9))
+        ax.set_ylabel(kind, size=14)
+        ax.set_xlabel('Country', size=14)
+        ax.set_title(f'Total {kind} for top {topN} regions of {country} as of {getYesterday()}', size=18)
 
 # Cell
 def getTimeSeriesConfirmed(download: bool=False, force: bool=False) -> pd.DataFrame:
@@ -141,18 +181,21 @@ procTimeSeriesConfirmed: Callable[[pd.DataFrame], pd.DataFrame] = lambda: procTi
 #procTimeSeriesRecovered: Callable[[pd.DataFrame], pd.DataFrame] = lambda: procTimeSeries(getTimeSeriesRecovered(download=True, force=True), 'Recovered')
 
 # Cell
-def plotCountriesTimeSeries(df: pd.DataFrame, countries: List, kind: str) -> None:
-    fig, ax = plt.subplots()
-    for country in countries:
-        ax = df[df['country'] == country].plot(ax=ax, y=kind, kind='line', figsize=(18,9))
-    ax.set_ylabel('Count', size=14)
-    ax.set_xlabel('Day', size=14)
-    ax.set_title(f'{kind} in {countries} as of {getYesterday()}', size=18)
-    ax.legend(ax.get_lines(),countries)
-    plt.show()
+def plotCountriesTimeSeries(df: pd.DataFrame, countries: List, kind: str, visualisation='matplotlib') -> None:
+    if visualisation == 'altair':
+        print("Not supported!")
+    else:
+        fig, ax = plt.subplots()
+        for country in countries:
+            ax = df[df['country'] == country].plot(ax=ax, y=kind, kind='line', figsize=(18,9))
+        ax.set_ylabel('Count', size=14)
+        ax.set_xlabel('Day', size=14)
+        ax.set_title(f'{kind} in {countries} as of {getYesterday()}', size=18)
+        ax.legend(ax.get_lines(),countries)
+        plt.show()
 
 # Cell
-def plotCountriesDailyReportFromAPI(normalised=False):
+def getCountriesDailyReportFromAPI(normalised=False):
     url = 'https://api.covid19api.com/summary'
     if normalised:
         df = pd.DataFrame(requests.get(url).json().get('Countries'))
@@ -160,17 +203,37 @@ def plotCountriesDailyReportFromAPI(normalised=False):
         cols = df.columns.to_list()
         sdf = df.groupby('Country')[cols[2:]].apply(sum).reset_index()
         sdf = sdf.sort_values(by=['TotalConfirmed'], ascending=False)
+    else:
+        sdf = pd.DataFrame(requests.get(url).json().get('Countries')).\
+          sort_values(by=['TotalConfirmed'], ascending=False)
+    return sdf
+
+def plotCountriesDailyReportFromAPI(normalised=False, visualisation='matplotlib'):
+    sdf = getCountriesDailyReportFromAPI(normalised)
+    if visualisation == 'altair':
+        print("Not supported!")
+    else:
         _ = sdf[sdf.TotalDeaths > 10].plot(kind='bar', x='Country', y=['TotalConfirmed', 'TotalDeaths'],\
           color='yr', stacked=True, figsize=(18, 9)).set_title('Covid-19 cases and deaths', size=18)
-    else:
-        df = pd.DataFrame(requests.get(url).json().get('Countries')).\
-          sort_values(by=['TotalConfirmed'], ascending=False)
-        _ = df[df.TotalDeaths > 10].plot(kind='bar', x='Country', y=['TotalConfirmed', 'TotalDeaths'],\
-          color='yr', stacked=True, figsize=(18, 9)).set_title('Covid-19 cases and deaths', size=18)
 
-def plotCategoryByCountry(category, country, color='y'):
+def getCategoryByCountryFromAPI(category, country, color):
     url = f'https://api.covid19api.com/total/country/{country}/status/{category.lower()}'
-    df = pd.DataFrame(requests.get(url).json())
-    df['Date'] = df['Date'].apply(pd.to_datetime)
-    df.plot(kind='line', x='Date', y='Cases', color=color, figsize=(18, 9)).\
-      set_title(f'Covid-19 {category} in {country}', size=18)
+    sdf = pd.DataFrame(requests.get(url).json())
+    sdf['Date'] = sdf['Date'].apply(pd.to_datetime)
+    return sdf
+
+def plotCategoryByCountryFromAPI(category, country, color='orange', visualisation='matplotlib'):
+    sdf = getCategoryByCountryFromAPI(category, country, color)
+    if visualisation == 'altair':
+        line_chart = alt.Chart(sdf).mark_line().encode(
+            x='Date:T',
+            y='Cases',
+            color=alt.value(color)
+        ).properties(
+            width=1000,
+            height=450
+        )
+        line_chart.display()
+    else:
+        sdf.plot(kind='line', x='Date', y='Cases', color=color, figsize=(18, 9)).\
+          set_title(f'Covid-19 {category} in {country}', size=18)

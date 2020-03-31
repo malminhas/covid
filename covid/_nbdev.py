@@ -22,8 +22,10 @@ index = {"setDefaults": "00_core.ipynb",
          "procTimeSeriesDeaths": "00_core.ipynb",
          "procTimeSeriesConfirmed": "00_core.ipynb",
          "plotCountriesTimeSeries": "00_core.ipynb",
+         "getCountriesDailyReportFromAPI": "00_core.ipynb",
          "plotCountriesDailyReportFromAPI": "00_core.ipynb",
-         "plotCategoryByCountry": "00_core.ipynb"}
+         "getCategoryByCountryFromAPI": "00_core.ipynb",
+         "plotCategoryByCountryFromAPI": "00_core.ipynb"}
 
 modules = ["core.py"]
 
