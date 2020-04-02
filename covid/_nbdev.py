@@ -2,7 +2,9 @@
 
 __all__ = ["index", "modules", "custom_doc_links", "git_url"]
 
-index = {"setDefaults": "00_core.ipynb",
+index = {"ALTAIR_W": "00_core.ipynb",
+         "ALTAIR_H": "00_core.ipynb",
+         "setDefaults": "00_core.ipynb",
          "ROOT": "00_core.ipynb",
          "CONFIRMED": "00_core.ipynb",
          "DEATHS": "00_core.ipynb",
