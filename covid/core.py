@@ -4,8 +4,9 @@ __all__ = ['ALTAIR_W', 'ALTAIR_H', 'setDefaults', 'ROOT', 'CONFIRMED', 'DEATHS',
            'getYesterday', 'getDayBeforeYesterday', 'procDataframe', 'procUrl', 'getCountriesDailyReport',
            'plotCountriesDailyReport', 'plotCountryDailyReport', 'getTimeSeriesConfirmed', 'getTimeSeriesDeaths',
            'getTimeSeriesRecovered', 'procTimeSeriesDataframe', 'procTimeSeries', 'procTimeSeriesDeaths',
-           'procTimeSeriesConfirmed', 'plotCountriesTimeSeries', 'getCountriesDailyReportFromAPI',
-           'plotCountriesDailyReportFromAPI', 'getCategoryByCountryFromAPI', 'plotCategoryByCountryFromAPI']
+           'procTimeSeriesConfirmed', 'procTimeSeriesRecovered', 'procNewCasesTimeSeries', 'plotCountriesTimeSeries',
+           'getCountriesDailyReportFromAPI', 'plotCountriesDailyReportFromAPI', 'getCategoryByCountryFromAPI',
+           'plotCategoryByCountryFromAPI']
 
 # Cell
 import typing
@@ -20,10 +21,15 @@ import urllib.request
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
+import numpy as np
 import altair as alt
+import warnings
+warnings.filterwarnings("ignore", category=RuntimeWarning) # for handling log(0)
 
 ALTAIR_W = 750
 ALTAIR_H = 375
+
+alt.renderers.enable('html')
 
 # Cell
 def setDefaults(figsize=(18,9)):
@@ -167,9 +173,11 @@ def getTimeSeriesRecovered(download: bool=False, force: bool=False) -> pd.DataFr
     return procUrl(url, download, localfile, force)
 
 # Cell
-def procTimeSeriesDataframe(r: List) -> pd.DataFrame:
+def procTimeSeriesDataframe(r: List, kind: str, log:bool=True) -> pd.DataFrame:
     sdf = pd.DataFrame(r)
     sdf['day'] = sdf['day'].apply(pd.to_datetime)
+    if log:
+        sdf[f'Log{kind}'] = np.log(sdf[kind])
     #sdf.set_index('day', drop=True, inplace=True)
     return sdf
 
@@ -189,33 +197,53 @@ def procTimeSeries(df: pd.DataFrame, kind: str) -> pd.DataFrame:
                 total = [a+b for a, b in zip(total, rvals[4:])]
         for a, b in zip(cols[4:], total):
             r.append({'day':a, 'country':country, kind:b})
-    return procTimeSeriesDataframe(r)
+    return procTimeSeriesDataframe(r, kind)
 
 procTimeSeriesDeaths: Callable[[pd.DataFrame], pd.DataFrame] = lambda: procTimeSeries(getTimeSeriesDeaths(download=True, force=True), 'Deaths')
 procTimeSeriesConfirmed: Callable[[pd.DataFrame], pd.DataFrame] = lambda: procTimeSeries(getTimeSeriesConfirmed(download=True, force=True), 'Confirmed')
-#procTimeSeriesRecovered: Callable[[pd.DataFrame], pd.DataFrame] = lambda: procTimeSeries(getTimeSeriesRecovered(download=True, force=True), 'Recovered')
+procTimeSeriesRecovered: Callable[[pd.DataFrame], pd.DataFrame] = lambda: procTimeSeries(getTimeSeriesRecovered(download=True, force=True), 'Recovered')
 
 # Cell
-def plotCountriesTimeSeries(df: pd.DataFrame, countries: List, which: str, kind: str, visualisation='matplotlib') -> None:
+def procNewCasesTimeSeries(df: pd.DataFrame, kind:str) -> pd.DataFrame:
+    r = []
+    #sdf = df[df.country.isin(countries)].copy()
+    countryGroups = df.groupby('country')
+    cols = df.columns.to_list()
+    cols.append('New')
+    for country, group in countryGroups:
+        gdf = group.copy()
+        gdf['New'] = gdf[kind].diff()
+        for row_index, row in gdf.iterrows():
+            r.append(dict(zip(cols,row.to_list())))
+    ndf = pd.DataFrame(r)
+    ndf['LogNew'] = np.log(ndf['New'])
+    return ndf
+
+# Cell
+def plotCountriesTimeSeries(df: pd.DataFrame, countries: List, which: str, x: str, y: str, visualisation='matplotlib') -> None:
     if visualisation == 'altair':
+        if x=='day':
+            xval = 'day:T'
+        else:
+            xval = f'{x}:Q'
         sdf = df[df.country.isin(countries)]
         line_chart = alt.Chart(sdf).mark_line().encode(
-            x='day:T',
-            y=f'{kind}:Q',
+            x=f'{xval}',
+            y=f'{y}:Q',
             color='country:N'
         ).properties(
             width=ALTAIR_W,
             height=ALTAIR_H,
-            title=f'{kind} in {countries} as of {which}'
+            title=f'{y} by {x} in {countries} as of {which}'
         )
         return line_chart
     else:
         fig, ax = plt.subplots()
         for country in countries:
-            ax = df[df['country'] == country].plot(ax=ax, x='day', y=kind, kind='line', figsize=(18,9))
-        ax.set_ylabel(kind, size=14)
+            ax = df[df['country'] == country].plot(ax=ax, x=x, y=y, kind='line', figsize=(18,9))
+        ax.set_ylabel(y, size=14)
         ax.set_xlabel('Day', size=14)
-        ax.set_title(f'{kind} in {countries} as of {which}', size=18)
+        ax.set_title(f'{y} by {x} in {countries} as of {which}', size=18)
         ax.legend(ax.get_lines(),countries)
         plt.show()
 
@@ -271,14 +299,18 @@ def getCategoryByCountryFromAPI(category: str, country: str, color: str) ->  pd.
     url = f'https://api.covid19api.com/total/country/{country}/status/{category.lower()}'
     sdf = pd.DataFrame(requests.get(url).json())
     sdf['Date'] = sdf['Date'].apply(pd.to_datetime)
+    sdf.rename(columns={"Cases": category}, inplace=True)
+    sdf[f'Log{category}'] = np.log(sdf[category])
     return sdf
 
-def plotCategoryByCountryFromAPI(category:str, country:str, color: str='orange', visualisation: str='matplotlib') -> None:
+def plotCategoryByCountryFromAPI(category:str, country:str, color: str='orange', log: bool=False, visualisation: str='matplotlib') -> None:
     sdf = getCategoryByCountryFromAPI(category, country, color)
+    if log:
+        category = f'Log{category}'
     if visualisation == 'altair':
         line_chart = alt.Chart(sdf).mark_line().encode(
             x='Date:T',
-            y='Cases',
+            y=category,
             color=alt.value(color)
         ).properties(
             width=ALTAIR_W,
@@ -287,5 +319,5 @@ def plotCategoryByCountryFromAPI(category:str, country:str, color: str='orange',
         )
         return line_chart
     else: # matplotlib
-        sdf.plot(kind='line', x='Date', y='Cases', color=color, figsize=(18, 9)).\
+        sdf.plot(kind='line', x='Date', y=category, color=color, figsize=(18, 9)).\
           set_title(f'Covid-19 {category} in {country}', size=18)

@@ -7,6 +7,7 @@
 2. [Installation](#covid-install)
 3. [Graphing current counts](#covid-current)
 4. [Graphing time series counts](#covid-timeseries)
+5. [Graphing new vs. existing cases](#covid-newexisting)
 5. [Graphing current and time series counts using Covid API](#covid-api)
 
 ## 1. Introduction <a name="covid-intro"></a>
@@ -30,7 +31,7 @@ This code is not yet in PyPI.  You can clone the repo and the corresponding func
 You can use `getCountriesDailyReport` to obtain a `pandas` dataframe `df` holding the latest values for each of `["Confirmed","Deaths","Recovered"]` by both `Province_State` and `Country_Region` as follows:
 
 ```python
-which = getDayBeforeYesterday()
+which = getYesterday()
 df = getCountriesDailyReport(which)
 ```
 
@@ -44,13 +45,13 @@ print(f'First {n} rows are:')
 print(df.iloc[:n,:])
 ```
 
-    df has 2434 rows and 12 columns with column names ['FIPS', 'Admin2', 'Province_State', 'Country_Region', 'Last_Update', 'Lat', 'Long_', 'Confirmed', 'Deaths', 'Recovered', 'Active', 'Combined_Key']
+    df has 2569 rows and 12 columns with column names ['FIPS', 'Admin2', 'Province_State', 'Country_Region', 'Last_Update', 'Lat', 'Long_', 'Confirmed', 'Deaths', 'Recovered', 'Active', 'Combined_Key']
     First 1 rows are:
           FIPS     Admin2  Province_State Country_Region         Last_Update  \
-    0  45001.0  Abbeville  South Carolina             US 2020-03-31 23:43:56   
+    0  45001.0  Abbeville  South Carolina             US 2020-04-02 23:25:27   
     
              Lat      Long_  Confirmed  Deaths  Recovered  Active  \
-    0  34.223334 -82.461707          4       0          0       0   
+    0  34.223334 -82.461707          6       0          0       0   
     
                         Combined_Key  
     0  Abbeville, South Carolina, US  
@@ -90,14 +91,14 @@ ddf = df.groupby('country')['Confirmed'].count().sort_values(ascending=True)
 print(f'max={ddf.max()}, min={ddf.min()}, count={len(ddf)}')
 ```
 
-    Found (12600, 3) (rows, cols) of cols=['day' 'country' 'Confirmed']
-    max=70, min=70, count=180
+    Found (13032, 4) (rows, cols) of cols=['day' 'country' 'Confirmed' 'LogConfirmed']
+    max=72, min=72, count=181
 
 
 Now we can plot a time series of confirmed cases of Covid-19 in China, Italy, US and UK as follows:
 
 ```python
-plotCountriesTimeSeries(df, ['China', 'Italy', 'US', 'United Kingdom'], which, 'Confirmed', visualisation=viz)
+plotCountriesTimeSeries(df, ['China', 'Italy', 'Spain', 'US', 'United Kingdom'], which, x='day', y='Confirmed', visualisation=viz)
 ```
 
 
@@ -108,14 +109,53 @@ And we can plot a time series of recorded deaths in these same countries as foll
 
 ```python
 df = procTimeSeriesDeaths()
-plotCountriesTimeSeries(df, ['China', 'Italy', 'US', 'United Kingdom'], which, 'Deaths', visualisation=viz)
+plotCountriesTimeSeries(df, ['China', 'Italy', 'Spain', 'US', 'United Kingdom'], which, x='day', y='Deaths', visualisation=viz)
 ```
 
 
 ![png](docs/images/output_20_0.png)
 
 
-## 5. Graphing current and time series counts using Covid API <a name="covid-api"></a>
+We can also view these as a log series over time:
+
+```python
+plotCountriesTimeSeries(df, ['China', 'Italy', 'Spain', 'US', 'United Kingdom'], which, x='day', y='LogDeaths', visualisation=viz)
+```
+
+
+![png](docs/images/output_22_0.png)
+
+
+## 5. Graphing new versus existing cases<a name="covid-newexsiting"></a>
+#### [back](#top-of-covid-notebook)
+
+[This video](https://youtu.be/54XLXg4fYsc) provides an excellent demystifier on how to view the Covid data using the following ground rules:
+* Use a log scale
+* Focus on change not absolute numbers
+* Don't plot against time
+
+From this analysis we see that we want to diff `Confirmed` cases between days to build up an `New` column as follows:
+
+```python
+ndf = procNewCasesTimeSeries(procTimeSeriesConfirmed(), 'Confirmed')
+plotCountriesTimeSeries(ndf, ['China', 'US'], which, x='LogConfirmed', y='LogNew', visualisation=viz)
+```
+
+
+![png](docs/images/output_25_0.png)
+
+
+```python
+plotCountriesTimeSeries(ndf, ['China', 'Italy', 'Spain', 'US', 'United Kingdom'], which, x='LogConfirmed', y='LogNew', visualisation=viz)
+```
+
+
+![png](docs/images/output_26_0.png)
+
+
+IMPORTANT: We also want to fix up the display of the log axis markers so they aren't 1, 2, 3, 4 etc.
+
+## 6. Graphing current and time series counts using Covid API <a name="covid-api"></a>
 #### [back](#top-of-covid-notebook)
 
 [This site](https://covid19api.com/) details an API that nicely wraps up the same JHU dataset and presents it as `json` via a REST API which allows us to go from API call to formatted graph showing cases and deaths by country using `altair` as follows:
@@ -125,7 +165,7 @@ plotCountriesDailyReportFromAPI(visualisation=viz)
 ```
 
 
-![png](docs/images/output_23_0.png)
+![png](docs/images/output_30_0.png)
 
 
 Note that not all the country names are fully normalised - Iran and South Korea appear twice.  You can normalise the data by passing in a `normalised=True` flag:
@@ -135,7 +175,7 @@ plotCountriesDailyReportFromAPI(normalised=True, visualisation=viz)
 ```
 
 
-![png](docs/images/output_25_0.png)
+![png](docs/images/output_32_0.png)
 
 
 It's also possible to do timeseries representation using this API by country using `altair` as follows:
@@ -145,7 +185,7 @@ plotCategoryByCountryFromAPI('Confirmed', 'united-kingdom', color='orange', visu
 ```
 
 
-![png](docs/images/output_27_0.png)
+![png](docs/images/output_34_0.png)
 
 
 ```python
@@ -153,7 +193,7 @@ plotCategoryByCountryFromAPI('Deaths', 'united-kingdom', color='red', visualisat
 ```
 
 
-![png](docs/images/output_28_0.png)
+![png](docs/images/output_35_0.png)
 
 
 We can also look at the US data:
@@ -163,5 +203,13 @@ plotCategoryByCountryFromAPI('Deaths', 'us', color='red', visualisation=viz)
 ```
 
 
-![png](docs/images/output_30_0.png)
+![png](docs/images/output_37_0.png)
+
+
+```python
+plotCategoryByCountryFromAPI('Deaths', 'us', color='red', log=True, visualisation=viz)
+```
+
+
+![png](docs/images/output_38_0.png)
 
