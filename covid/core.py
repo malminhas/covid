@@ -29,7 +29,7 @@ warnings.filterwarnings("ignore", category=RuntimeWarning) # for handling log(0)
 ALTAIR_W = 750
 ALTAIR_H = 375
 
-alt.renderers.enable('html')
+alt.renderers.enable('svg')
 
 # Cell
 def setDefaults(figsize=(18,9)):
