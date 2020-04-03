@@ -45,10 +45,10 @@ print(f'First {n} rows are:')
 print(df.iloc[:n,:])
 ```
 
-    df has 2569 rows and 12 columns with column names ['FIPS', 'Admin2', 'Province_State', 'Country_Region', 'Last_Update', 'Lat', 'Long_', 'Confirmed', 'Deaths', 'Recovered', 'Active', 'Combined_Key']
+    df has 2625 rows and 12 columns with column names ['FIPS', 'Admin2', 'Province_State', 'Country_Region', 'Last_Update', 'Lat', 'Long_', 'Confirmed', 'Deaths', 'Recovered', 'Active', 'Combined_Key']
     First 1 rows are:
           FIPS     Admin2  Province_State Country_Region         Last_Update  \
-    0  45001.0  Abbeville  South Carolina             US 2020-04-02 23:25:27   
+    0  45001.0  Abbeville  South Carolina             US 2020-04-03 22:46:37   
     
              Lat      Long_  Confirmed  Deaths  Recovered  Active  \
     0  34.223334 -82.461707          6       0          0       0   
@@ -61,12 +61,15 @@ You can plot this data aggregated by country and `kind` as follows.  Note here t
 
 ```python
 setDefaults()
-viz = 'matplotlib'
+viz = 'altair'
 plotCountriesDailyReport(getCountriesDailyReport(which), which, topN=15, color='red', kind='Deaths',visualisation=viz)
 ```
 
 
-![png](docs/images/output_11_0.png)
+
+
+![svg](docs/images/output_11_0.svg)
+
 
 
 We can also dig into the breakdown per country if available as follows:
@@ -76,7 +79,10 @@ plotCountryDailyReport(getCountriesDailyReport(which), 'US', which, topN=15, col
 ```
 
 
-![png](docs/images/output_13_0.png)
+
+
+![svg](docs/images/output_13_0.svg)
+
 
 
 ## 4. Graphing time series counts <a name="covid-timeseries"></a>
@@ -102,7 +108,10 @@ plotCountriesTimeSeries(df, ['China', 'Italy', 'Spain', 'US', 'United Kingdom'],
 ```
 
 
-![png](docs/images/output_18_0.png)
+
+
+![svg](docs/images/output_18_0.svg)
+
 
 
 And we can plot a time series of recorded deaths in these same countries as follows:
@@ -113,7 +122,10 @@ plotCountriesTimeSeries(df, ['China', 'Italy', 'Spain', 'US', 'United Kingdom'],
 ```
 
 
-![png](docs/images/output_20_0.png)
+
+
+![svg](docs/images/output_20_0.svg)
+
 
 
 We can also view these as a log series over time:
@@ -123,7 +135,10 @@ plotCountriesTimeSeries(df, ['China', 'Italy', 'Spain', 'US', 'United Kingdom'],
 ```
 
 
-![png](docs/images/output_22_0.png)
+
+
+![svg](docs/images/output_22_0.svg)
+
 
 
 ## 5. Graphing new versus existing cases<a name="covid-newexsiting"></a>
@@ -142,7 +157,10 @@ plotCountriesTimeSeries(ndf, ['China', 'US'], which, x='LogConfirmed', y='LogNew
 ```
 
 
-![png](docs/images/output_25_0.png)
+
+
+![svg](docs/images/output_25_0.svg)
+
 
 
 ```python
@@ -150,7 +168,10 @@ plotCountriesTimeSeries(ndf, ['China', 'Italy', 'Spain', 'US', 'United Kingdom']
 ```
 
 
-![png](docs/images/output_26_0.png)
+
+
+![svg](docs/images/output_26_0.svg)
+
 
 
 IMPORTANT: We also want to fix up the display of the log axis markers so they aren't 1, 2, 3, 4 etc.
@@ -165,7 +186,10 @@ plotCountriesDailyReportFromAPI(visualisation=viz)
 ```
 
 
-![png](docs/images/output_30_0.png)
+
+
+![svg](docs/images/output_30_0.svg)
+
 
 
 Note that not all the country names are fully normalised - Iran and South Korea appear twice.  You can normalise the data by passing in a `normalised=True` flag:
@@ -175,7 +199,10 @@ plotCountriesDailyReportFromAPI(normalised=True, visualisation=viz)
 ```
 
 
-![png](docs/images/output_32_0.png)
+
+
+![svg](docs/images/output_32_0.svg)
+
 
 
 It's also possible to do timeseries representation using this API by country using `altair` as follows:
@@ -185,7 +212,10 @@ plotCategoryByCountryFromAPI('Confirmed', 'united-kingdom', color='orange', visu
 ```
 
 
-![png](docs/images/output_34_0.png)
+
+
+![svg](docs/images/output_34_0.svg)
+
 
 
 ```python
@@ -193,7 +223,10 @@ plotCategoryByCountryFromAPI('Deaths', 'united-kingdom', color='red', visualisat
 ```
 
 
-![png](docs/images/output_35_0.png)
+
+
+![svg](docs/images/output_35_0.svg)
+
 
 
 We can also look at the US data:
@@ -203,7 +236,10 @@ plotCategoryByCountryFromAPI('Deaths', 'us', color='red', visualisation=viz)
 ```
 
 
-![png](docs/images/output_37_0.png)
+
+
+![svg](docs/images/output_37_0.svg)
+
 
 
 ```python
@@ -211,5 +247,8 @@ plotCategoryByCountryFromAPI('Deaths', 'us', color='red', log=True, visualisatio
 ```
 
 
-![png](docs/images/output_38_0.png)
+
+
+![svg](docs/images/output_38_0.svg)
+
 
