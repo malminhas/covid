@@ -115,6 +115,10 @@ def plotCountriesDailyReport(df: pd.DataFrame, which: str, topN: int=10, color: 
             width=ALTAIR_W,
             height=ALTAIR_H,
             title=f'Total {kind} by top {topN} countries as of {which}'
+        ).configure_axis(
+            grid=False
+        ).configure_view(
+            strokeWidth=0
         )
         return bar_chart
     else:
@@ -147,6 +151,10 @@ def plotCountryDailyReport(df: pd.DataFrame, country: str, which: str, topN: int
             width=ALTAIR_W,
             height=ALTAIR_H,
             title=f'Total {kind} for top {topN} regions of {country} as of {which}'
+        ).configure_axis(
+            grid=False
+        ).configure_view(
+            strokeWidth=0
         )
         return bar_chart
     else:
@@ -230,11 +238,17 @@ def plotCountriesTimeSeries(df: pd.DataFrame, countries: List, which: str, x: st
         line_chart = alt.Chart(sdf).mark_line().encode(
             x=f'{xval}',
             y=f'{y}:Q',
+            #x=alt.X(f'{xval}', axis=alt.Axis(format='ln', title=x)),
+            #y=alt.Y(f'{y}:Q', axis=alt.Axis(format='ln', title=y)),
             color='country:N'
         ).properties(
             width=ALTAIR_W,
             height=ALTAIR_H,
             title=f'{y} by {x} in {countries} as of {which}'
+        ).configure_axis(
+            grid=False
+        ).configure_view(
+            strokeWidth=0
         )
         return line_chart
     else:
@@ -289,6 +303,10 @@ def plotCountriesDailyReportFromAPI(normalised=False, visualisation='matplotlib'
             width=ALTAIR_W,
             height=ALTAIR_H,
             title='Covid-19 cases and deaths'
+        ).configure_axis(
+            grid=False
+        ).configure_view(
+            strokeWidth=0
         )
         return bar_chart
     else: # matplotlib
@@ -316,6 +334,10 @@ def plotCategoryByCountryFromAPI(category:str, country:str, color: str='orange',
             width=ALTAIR_W,
             height=ALTAIR_H,
             title=f'Covid-19 {category} in {country}'
+        ).configure_axis(
+            grid=False
+        ).configure_view(
+            strokeWidth=0
         )
         return line_chart
     else: # matplotlib

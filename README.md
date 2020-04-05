@@ -1,5 +1,5 @@
 # covid <a name="top-of-covid-notebook"></a>
-> Visualise the John Hopkins Covid-19 dataset.
+> Visualise the John Hopkins Covid-19 dataset with a little help from [nbdev](http://nbdev.fast.ai/).
 
 
 ## Contents
@@ -13,7 +13,7 @@
 ## 1. Introduction <a name="covid-intro"></a>
 #### [back](#top-of-covid-notebook)
 
-The `covid` module provides convenience utilities for graphing the covid-19 dataset published by John Hopkins University (JHU) [here](https://github.com/CSSEGISandData/COVID-19).  The JHU dataset is updated daily with the latest in separate time series csv files covering [here](https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data/csse_covid_19_time_series):
+The accompanying `covid` module built using [nbdev](http://nbdev.fast.ai/) provides convenience utilities for graphing the covid-19 dataset published by John Hopkins University (JHU) [here](https://github.com/CSSEGISandData/COVID-19).  The JHU dataset is updated daily with the latest in separate time series csv files covering [here](https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data/csse_covid_19_time_series):
 * `time_series_covid19_confirmed_global.csv`
 * `time_series_covid19_deaths_global.csv`
 * `time_series_covid19_recovered_global.csv`
@@ -45,10 +45,10 @@ print(f'First {n} rows are:')
 print(df.iloc[:n,:])
 ```
 
-    df has 2625 rows and 12 columns with column names ['FIPS', 'Admin2', 'Province_State', 'Country_Region', 'Last_Update', 'Lat', 'Long_', 'Confirmed', 'Deaths', 'Recovered', 'Active', 'Combined_Key']
+    df has 2679 rows and 12 columns with column names ['FIPS', 'Admin2', 'Province_State', 'Country_Region', 'Last_Update', 'Lat', 'Long_', 'Confirmed', 'Deaths', 'Recovered', 'Active', 'Combined_Key']
     First 1 rows are:
           FIPS     Admin2  Province_State Country_Region         Last_Update  \
-    0  45001.0  Abbeville  South Carolina             US 2020-04-03 22:46:37   
+    0  45001.0  Abbeville  South Carolina             US 2020-04-04 23:34:21   
     
              Lat      Long_  Confirmed  Deaths  Recovered  Active  \
     0  34.223334 -82.461707          6       0          0       0   
@@ -97,8 +97,8 @@ ddf = df.groupby('country')['Confirmed'].count().sort_values(ascending=True)
 print(f'max={ddf.max()}, min={ddf.min()}, count={len(ddf)}')
 ```
 
-    Found (13032, 4) (rows, cols) of cols=['day' 'country' 'Confirmed' 'LogConfirmed']
-    max=72, min=72, count=181
+    Found (13394, 4) (rows, cols) of cols=['day' 'country' 'Confirmed' 'LogConfirmed']
+    max=74, min=74, count=181
 
 
 Now we can plot a time series of confirmed cases of Covid-19 in China, Italy, US and UK as follows:
@@ -141,7 +141,7 @@ plotCountriesTimeSeries(df, ['China', 'Italy', 'Spain', 'US', 'United Kingdom'],
 
 
 
-## 5. Graphing new versus existing cases<a name="covid-newexsiting"></a>
+## 5. Graphing new versus existing cases<a name="covid-newexisting"></a>
 #### [back](#top-of-covid-notebook)
 
 [This video](https://youtu.be/54XLXg4fYsc) provides an excellent demystifier on how to view the Covid data using the following ground rules:
@@ -164,13 +164,25 @@ plotCountriesTimeSeries(ndf, ['China', 'US'], which, x='LogConfirmed', y='LogNew
 
 
 ```python
-plotCountriesTimeSeries(ndf, ['China', 'Italy', 'Spain', 'US', 'United Kingdom'], which, x='LogConfirmed', y='LogNew', visualisation=viz)
+countries = ['China', 'Italy', 'Spain', 'US', 'United Kingdom']
+plotCountriesTimeSeries(ndf, countries, which, x='LogConfirmed', y='LogNew', visualisation=viz)
 ```
 
 
 
 
 ![svg](docs/images/output_26_0.svg)
+
+
+
+```python
+plotCountriesTimeSeries(procNewCasesTimeSeries(procTimeSeriesDeaths(), 'Deaths'), countries, which, x='LogDeaths', y='LogNew', visualisation=viz)
+```
+
+
+
+
+![svg](docs/images/output_27_0.svg)
 
 
 
@@ -188,57 +200,33 @@ plotCountriesDailyReportFromAPI(visualisation=viz)
 
 
 
-![svg](docs/images/output_30_0.svg)
-
-
-
-Note that not all the country names are fully normalised - Iran and South Korea appear twice.  You can normalise the data by passing in a `normalised=True` flag:
-
-```python
-plotCountriesDailyReportFromAPI(normalised=True, visualisation=viz)
-```
-
-
-
-
-![svg](docs/images/output_32_0.svg)
+![svg](docs/images/output_31_0.svg)
 
 
 
 It's also possible to do timeseries representation using this API by country using `altair` as follows:
 
 ```python
-plotCategoryByCountryFromAPI('Confirmed', 'united-kingdom', color='orange', visualisation=viz)
+plotCategoryByCountryFromAPI('Confirmed', 'us', color='orange', visualisation=viz)
 ```
 
 
 
 
-![svg](docs/images/output_34_0.svg)
-
-
-
-```python
-plotCategoryByCountryFromAPI('Deaths', 'united-kingdom', color='red', visualisation=viz)
-```
-
-
-
-
-![svg](docs/images/output_35_0.svg)
+![svg](docs/images/output_33_0.svg)
 
 
 
 We can also look at the US data:
 
 ```python
-plotCategoryByCountryFromAPI('Deaths', 'us', color='red', visualisation=viz)
+plotCategoryByCountryFromAPI('Confirmed', 'us', color='orange', log=True, visualisation=viz)
 ```
 
 
 
 
-![svg](docs/images/output_37_0.svg)
+![svg](docs/images/output_35_0.svg)
 
 
 
@@ -249,6 +237,6 @@ plotCategoryByCountryFromAPI('Deaths', 'us', color='red', log=True, visualisatio
 
 
 
-![svg](docs/images/output_38_0.svg)
+![svg](docs/images/output_36_0.svg)
 
 
