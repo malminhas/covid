@@ -108,18 +108,13 @@ def plotCountriesDailyReport(df: pd.DataFrame, which: str, topN: int=10, color: 
         print(f'Empty data frame - are you sure the file/url exists?')
         return df
     if visualisation == 'altair':
-        sdf = df.groupby('Country_Region')[kind].sum().sort_values(ascending=False)[:topN]
-        keys = sdf.keys().to_list()
-        vals = sdf.to_list()
-        data = []
-        for k,v in zip(keys,vals):
-            data.append({'Country':k, kind: v})
-        sdf = pd.DataFrame(data)
-        bar_chart = alt.Chart(sdf).mark_bar(size=30).encode(
-            x=alt.X('Country',sort='-y'),
-            y=kind,
+        # use aggregate transform and limit to just the topN countries pulled out via groupby
+        countries = df.groupby('Country_Region')[kind].sum().sort_values(ascending=False)[:topN].keys().to_list()
+        bar_chart = alt.Chart(df[df['Country_Region'].isin(countries)]).mark_bar(size=30).encode(
+            x=alt.X('Country_Region',sort='-y'),
+            y=alt.Y(f'sum({kind}):Q'),
             color=alt.value(color),
-            opacity=alt.value(0.9),
+            opacity=alt.value(0.9)
         ).properties(
             width=ALTAIR_W,
             height=ALTAIR_H,
@@ -143,18 +138,15 @@ def plotCountryDailyReport(df: pd.DataFrame, country: str, which: str, topN: int
         print(f'Empty data frame - are you sure the file/url exists?')
         return df
     if visualisation == 'altair':
-        sdf = df[df['Country_Region'] == country].groupby('Province_State')[kind].sum().sort_values(ascending=False)[:topN]
-        keys = sdf.keys().to_list()
-        vals = sdf.to_list()
-        data = []
-        for k,v in zip(keys,vals):
-            data.append({'Province_State':k, kind: v})
-        sdf = pd.DataFrame(data)
-        bar_chart = alt.Chart(sdf).mark_bar(size=30).encode(
+        # we're only interested in subset of regions relating to country
+        sdf = df[df['Country_Region'] == country]
+        # use aggregate transform and limit to just the topN countries pulled out via groupby
+        regions = sdf.groupby('Province_State')[kind].sum().sort_values(ascending=False)[:topN].keys().to_list()
+        bar_chart = alt.Chart(df[df['Province_State'].isin(regions)]).mark_bar(size=30).encode(
             x=alt.X('Province_State',sort='-y'),
-            y=kind,
+            y=alt.Y(f'sum({kind}):Q'),
             color=alt.value(color),
-            opacity=alt.value(0.9),
+            opacity=alt.value(0.9)
         ).properties(
             width=ALTAIR_W,
             height=ALTAIR_H,

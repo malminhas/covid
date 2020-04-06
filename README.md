@@ -62,7 +62,8 @@ You can plot this data aggregated by country and `kind` as follows.  Note here t
 ```python
 setDefaults()
 viz = 'altair'
-plotCountriesDailyReport(getCountriesDailyReport(which), which, topN=15, color='red', kind='Deaths',visualisation=viz)
+plotCountriesDailyReport(getCountriesDailyReport(which), which, topN=15, 
+                         color='red', kind='Deaths',visualisation=viz)
 ```
 
 
@@ -75,7 +76,8 @@ plotCountriesDailyReport(getCountriesDailyReport(which), which, topN=15, color='
 We can also dig into the breakdown per country if available as follows:
 
 ```python
-plotCountryDailyReport(getCountriesDailyReport(which), 'US', which, topN=15, color='red', kind='Deaths', visualisation=viz)
+plotCountryDailyReport(getCountriesDailyReport(which), 'US', which, topN=15, 
+                       color='red', kind='Deaths', visualisation=viz)
 ```
 
 
@@ -104,7 +106,8 @@ print(f'max={ddf.max()}, min={ddf.min()}, count={len(ddf)}')
 Now we can plot a time series of confirmed cases of Covid-19 in China, Italy, US and UK as follows:
 
 ```python
-plotCountriesTimeSeries(df, ['China', 'Italy', 'Spain', 'US', 'United Kingdom'], which, x='day', y='Confirmed', visualisation=viz)
+plotCountriesTimeSeries(df, ['China', 'Italy', 'Spain', 'US', 'United Kingdom'], 
+                        which, x='day', y='Confirmed', visualisation=viz)
 ```
 
 
@@ -118,7 +121,8 @@ And we can plot a time series of recorded deaths in these same countries as foll
 
 ```python
 df = procTimeSeriesDeaths()
-plotCountriesTimeSeries(df, ['China', 'Italy', 'Spain', 'US', 'United Kingdom'], which, x='day', y='Deaths', visualisation=viz)
+plotCountriesTimeSeries(df, ['China', 'Italy', 'Spain', 'US', 'United Kingdom'], 
+                        which, x='day', y='Deaths', visualisation=viz)
 ```
 
 
@@ -131,7 +135,8 @@ plotCountriesTimeSeries(df, ['China', 'Italy', 'Spain', 'US', 'United Kingdom'],
 We can also view these as a log series over time:
 
 ```python
-plotCountriesTimeSeries(df, ['China', 'Italy', 'Spain', 'US', 'United Kingdom'], which, x='day', y='LogDeaths', visualisation=viz)
+plotCountriesTimeSeries(df, ['China', 'Italy', 'Spain', 'US', 'United Kingdom'], 
+                        which, x='day', y='LogDeaths', visualisation=viz)
 ```
 
 
@@ -194,7 +199,8 @@ plotCountriesTimeSeries(ndf, countries, which, x='LogDeaths', y='LogNew', grid=F
 It would be nice to view that data  also want to fix up the display of the log axis markers so they show the actual numbers and to filter out some of the low data values to make the trends a bit clearer.  We can do that by setting `log` true as follows and leaving the grid on (note this only works for `altair` right now):
 
 ```python
-plotCountriesTimeSeries(ndf, countries, which, x='Deaths', y='New', clampx=100, clampy=5, log=True, grid=True, visualisation=viz)
+plotCountriesTimeSeries(ndf, countries, which, x='Deaths', y='New', clampx=100, clampy=5, 
+                        log=True, grid=True, visualisation=viz)
 ```
 
 
