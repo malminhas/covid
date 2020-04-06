@@ -31,7 +31,7 @@ This code is not yet in PyPI.  You can clone the repo and the corresponding func
 You can use `getCountriesDailyReport` to obtain a `pandas` dataframe `df` holding the latest values for each of `["Confirmed","Deaths","Recovered"]` by both `Province_State` and `Country_Region` as follows:
 
 ```python
-which = getYesterday()
+which = getDayBeforeYesterday()
 df = getCountriesDailyReport(which)
 ```
 
@@ -97,8 +97,8 @@ ddf = df.groupby('country')['Confirmed'].count().sort_values(ascending=True)
 print(f'max={ddf.max()}, min={ddf.min()}, count={len(ddf)}')
 ```
 
-    Found (13394, 4) (rows, cols) of cols=['day' 'country' 'Confirmed' 'LogConfirmed']
-    max=74, min=74, count=181
+    Found (13725, 4) (rows, cols) of cols=['day' 'country' 'Confirmed' 'LogConfirmed']
+    max=75, min=75, count=183
 
 
 Now we can plot a time series of confirmed cases of Covid-19 in China, Italy, US and UK as follows:
@@ -149,7 +149,7 @@ plotCountriesTimeSeries(df, ['China', 'Italy', 'Spain', 'US', 'United Kingdom'],
 * Focus on change not absolute numbers
 * Don't plot against time
 
-From this analysis we see that we want to diff `Confirmed` cases between days to build up an `New` column as follows:
+From this analysis we see that we want to diff `Confirmed` cases between days to build up an `New` column and then plot the logs of both against each other as follows:
 
 ```python
 ndf = procNewCasesTimeSeries(procTimeSeriesConfirmed(), 'Confirmed')
@@ -163,20 +163,11 @@ plotCountriesTimeSeries(ndf, ['China', 'US'], which, x='LogConfirmed', y='LogNew
 
 
 
+We can look at the same ddata across a wider range of countries as follows:
+
 ```python
 countries = ['China', 'Italy', 'Spain', 'US', 'United Kingdom']
 plotCountriesTimeSeries(ndf, countries, which, x='LogConfirmed', y='LogNew', visualisation=viz)
-```
-
-
-
-
-![svg](docs/images/output_26_0.svg)
-
-
-
-```python
-plotCountriesTimeSeries(procNewCasesTimeSeries(procTimeSeriesDeaths(), 'Deaths'), countries, which, x='LogDeaths', y='LogNew', visualisation=viz)
 ```
 
 
@@ -186,7 +177,33 @@ plotCountriesTimeSeries(procNewCasesTimeSeries(procTimeSeriesDeaths(), 'Deaths')
 
 
 
-IMPORTANT: We also want to fix up the display of the log axis markers so they aren't 1, 2, 3, 4 etc.
+We can also view the same set of countries in a similar way in respect of deaths.  Note here the grid is being removed for clarity:
+
+```python
+ndf = procNewCasesTimeSeries(procTimeSeriesDeaths(), 'Deaths')
+plotCountriesTimeSeries(ndf, countries, which, x='LogDeaths', y='LogNew', grid=False, visualisation=viz)
+```
+
+
+
+
+![svg](docs/images/output_29_0.svg)
+
+
+
+It would be nice to view that data  also want to fix up the display of the log axis markers so they show the actual numbers and to filter out some of the low data values to make the trends a bit clearer.  We can do that by setting `log` true as follows and leaving the grid on (note this only works for `altair` right now):
+
+```python
+ndf = procNewCasesTimeSeries(procTimeSeriesDeaths(), 'Deaths')
+plotCountriesTimeSeries(ndf, countries, which, x='Deaths', y='New', log=True, grid=True, visualisation=viz)
+```
+
+
+
+
+![svg](docs/images/output_31_0.svg)
+
+
 
 ## 6. Graphing current and time series counts using Covid API <a name="covid-api"></a>
 #### [back](#top-of-covid-notebook)
@@ -200,11 +217,13 @@ plotCountriesDailyReportFromAPI(visualisation=viz)
 
 
 
-![svg](docs/images/output_31_0.svg)
+![svg](docs/images/output_34_0.svg)
 
 
 
-It's also possible to do timeseries representation using this API by country using `altair` as follows:
+There used to be an issue with normalisation of this data a while back with Iran and South Korea appearing twice but that seems to have been fixed.
+
+It's also possible to do timeseries representation using this API by country using `altair` as follows for the US confirmed cases:
 
 ```python
 plotCategoryByCountryFromAPI('Confirmed', 'us', color='orange', visualisation=viz)
@@ -213,11 +232,11 @@ plotCategoryByCountryFromAPI('Confirmed', 'us', color='orange', visualisation=vi
 
 
 
-![svg](docs/images/output_33_0.svg)
+![svg](docs/images/output_37_0.svg)
 
 
 
-We can also look at the US data:
+We can also look at the same data in log format:
 
 ```python
 plotCategoryByCountryFromAPI('Confirmed', 'us', color='orange', log=True, visualisation=viz)
@@ -226,9 +245,11 @@ plotCategoryByCountryFromAPI('Confirmed', 'us', color='orange', log=True, visual
 
 
 
-![svg](docs/images/output_35_0.svg)
+![svg](docs/images/output_39_0.svg)
 
 
+
+We can also look at Deaths in this case in log format:
 
 ```python
 plotCategoryByCountryFromAPI('Deaths', 'us', color='red', log=True, visualisation=viz)
@@ -237,6 +258,6 @@ plotCategoryByCountryFromAPI('Deaths', 'us', color='red', log=True, visualisatio
 
 
 
-![svg](docs/images/output_36_0.svg)
+![svg](docs/images/output_41_0.svg)
 
 
