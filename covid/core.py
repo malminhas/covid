@@ -243,7 +243,6 @@ def plotCountriesTimeSeries(df: pd.DataFrame, countries: List, which: str, x: st
             xval = 'day:T'
         else:
             if log:
-                #xval = alt.X(f'{x}:Q', scale=alt.Scale(type='log', domain=[100, 30000]), axis=alt.Axis(tickCount=10))
                 xval = alt.X(f'{x}:Q', scale=alt.Scale(type='log', domain=(100, 30000)), axis=alt.Axis(tickCount=8))
                 sdf = sdf[sdf[x] >= 100]
             else:
