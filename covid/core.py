@@ -235,7 +235,8 @@ def procNewCasesTimeSeries(df: pd.DataFrame, kind:str) -> pd.DataFrame:
 
 # Cell
 def plotCountriesTimeSeries(df: pd.DataFrame, countries: List, which: str, x: str, y: str,
-                            grid: bool=True, log: bool=False, visualisation='matplotlib') -> None:
+                            grid: bool=True, log: bool=False, clampx: int=100, clampy: int=7,
+                            visualisation='matplotlib') -> None:
     if visualisation == 'altair':
         sdf = df[df.country.isin(countries)]
         title = f'{y} by {x} in {countries} as of {which}'
@@ -243,14 +244,14 @@ def plotCountriesTimeSeries(df: pd.DataFrame, countries: List, which: str, x: st
             xval = 'day:T'
         else:
             if log:
-                xval = alt.X(f'{x}:Q', scale=alt.Scale(type='log', domain=(100, 30000)), axis=alt.Axis(tickCount=8))
-                sdf = sdf[sdf[x] >= 100]
+                xval = alt.X(f'{x}:Q', scale=alt.Scale(type='log', domain=(clampx, 30000)), axis=alt.Axis(tickCount=8))
+                sdf = sdf[sdf[x] > clampx]
             else:
                 xval = f'{x}:Q'
         if log:
             title = f'Log graph of {y} by {x} in {countries} as of {which}'
             yval = alt.Y(f'{y}:Q', scale=alt.Scale(type='log'), axis=alt.Axis(tickCount=4))
-            sdf = sdf[sdf[y] > 7]
+            sdf = sdf[sdf[y] > clampy]
         else:
             yval = f'{y}:Q'
         line_chart = alt.Chart(sdf).mark_line().encode(

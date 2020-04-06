@@ -31,7 +31,7 @@ This code is not yet in PyPI.  You can clone the repo and the corresponding func
 You can use `getCountriesDailyReport` to obtain a `pandas` dataframe `df` holding the latest values for each of `["Confirmed","Deaths","Recovered"]` by both `Province_State` and `Country_Region` as follows:
 
 ```python
-which = getDayBeforeYesterday()
+which = getYesterday()
 df = getCountriesDailyReport(which)
 ```
 
@@ -45,10 +45,10 @@ print(f'First {n} rows are:')
 print(df.iloc[:n,:])
 ```
 
-    df has 2679 rows and 12 columns with column names ['FIPS', 'Admin2', 'Province_State', 'Country_Region', 'Last_Update', 'Lat', 'Long_', 'Confirmed', 'Deaths', 'Recovered', 'Active', 'Combined_Key']
+    df has 2764 rows and 12 columns with column names ['FIPS', 'Admin2', 'Province_State', 'Country_Region', 'Last_Update', 'Lat', 'Long_', 'Confirmed', 'Deaths', 'Recovered', 'Active', 'Combined_Key']
     First 1 rows are:
           FIPS     Admin2  Province_State Country_Region         Last_Update  \
-    0  45001.0  Abbeville  South Carolina             US 2020-04-04 23:34:21   
+    0  45001.0  Abbeville  South Carolina             US 2020-04-05 23:06:45   
     
              Lat      Long_  Confirmed  Deaths  Recovered  Active  \
     0  34.223334 -82.461707          6       0          0       0   
@@ -194,8 +194,7 @@ plotCountriesTimeSeries(ndf, countries, which, x='LogDeaths', y='LogNew', grid=F
 It would be nice to view that data  also want to fix up the display of the log axis markers so they show the actual numbers and to filter out some of the low data values to make the trends a bit clearer.  We can do that by setting `log` true as follows and leaving the grid on (note this only works for `altair` right now):
 
 ```python
-ndf = procNewCasesTimeSeries(procTimeSeriesDeaths(), 'Deaths')
-plotCountriesTimeSeries(ndf, countries, which, x='Deaths', y='New', log=True, grid=True, visualisation=viz)
+plotCountriesTimeSeries(ndf, countries, which, x='Deaths', y='New', clampx=100, clampy=5, log=True, grid=True, visualisation=viz)
 ```
 
 
