@@ -30,8 +30,10 @@ index = {"ALTAIR_W": "00_core.ipynb",
          "plotCountriesTimeSeries": "00_core.ipynb",
          "getCountriesDailyReportFromAPI": "00_core.ipynb",
          "plotCountriesDailyReportFromAPI": "00_core.ipynb",
-         "getCategoryByCountryFromAPI": "00_core.ipynb",
-         "plotCategoryByCountryFromAPI": "00_core.ipynb"}
+         "getCategoryTimeSeriesByCountryFromAPI": "00_core.ipynb",
+         "plotCategoryTimeSeriesByCountryFromAPI": "00_core.ipynb",
+         "getCategoriesTimeSeriesByCountryFromAPI": "00_core.ipynb",
+         "plotCategoriesTimeSeriesByCountryFromAPI": "00_core.ipynb"}
 
 modules = ["core.py"]
 

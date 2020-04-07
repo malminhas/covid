@@ -45,10 +45,10 @@ print(f'First {n} rows are:')
 print(df.iloc[:n,:])
 ```
 
-    df has 2764 rows and 12 columns with column names ['FIPS', 'Admin2', 'Province_State', 'Country_Region', 'Last_Update', 'Lat', 'Long_', 'Confirmed', 'Deaths', 'Recovered', 'Active', 'Combined_Key']
+    df has 2809 rows and 12 columns with column names ['FIPS', 'Admin2', 'Province_State', 'Country_Region', 'Last_Update', 'Lat', 'Long_', 'Confirmed', 'Deaths', 'Recovered', 'Active', 'Combined_Key']
     First 1 rows are:
           FIPS     Admin2  Province_State Country_Region         Last_Update  \
-    0  45001.0  Abbeville  South Carolina             US 2020-04-05 23:06:45   
+    0  45001.0  Abbeville  South Carolina             US 2020-04-06 23:22:15   
     
              Lat      Long_  Confirmed  Deaths  Recovered  Active  \
     0  34.223334 -82.461707          6       0          0       0   
@@ -99,8 +99,8 @@ ddf = df.groupby('country')['Confirmed'].count().sort_values(ascending=True)
 print(f'max={ddf.max()}, min={ddf.min()}, count={len(ddf)}')
 ```
 
-    Found (13725, 4) (rows, cols) of cols=['day' 'country' 'Confirmed' 'LogConfirmed']
-    max=75, min=75, count=183
+    Found (13984, 4) (rows, cols) of cols=['day' 'country' 'Confirmed' 'LogConfirmed']
+    max=76, min=76, count=184
 
 
 Now we can plot a time series of confirmed cases of Covid-19 in China, Italy, US and UK as follows:
@@ -210,6 +210,18 @@ plotCountriesTimeSeries(ndf, countries, which, x='Deaths', y='New', clampx=100, 
 
 
 
+```python
+plotCountriesTimeSeries(ndf, countries, which, x='Deaths', y='New', clampx=100, clampy=5, 
+                        log=True, useLoess=True, grid=True, visualisation=viz)
+```
+
+
+
+
+![svg](docs/images/output_32_0.svg)
+
+
+
 ## 6. Graphing current and time series counts using Covid API <a name="covid-api"></a>
 #### [back](#top-of-covid-notebook)
 
@@ -222,7 +234,7 @@ plotCountriesDailyReportFromAPI(visualisation=viz)
 
 
 
-![svg](docs/images/output_34_0.svg)
+![svg](docs/images/output_35_0.svg)
 
 
 
@@ -231,38 +243,50 @@ There used to be an issue with normalisation of this data a while back with Iran
 It's also possible to do timeseries representation using this API by country using `altair` as follows for the US confirmed cases:
 
 ```python
-plotCategoryByCountryFromAPI('Confirmed', 'us', color='orange', visualisation=viz)
+country = 'united-kingdom'
+plotCategoryTimeSeriesByCountryFromAPI('Confirmed', country, color='orange', visualisation=viz)
 ```
 
 
 
 
-![svg](docs/images/output_37_0.svg)
+![svg](docs/images/output_38_0.svg)
 
 
 
-We can also look at the same data in log format:
+We can also look at the data in log format:
 
 ```python
-plotCategoryByCountryFromAPI('Confirmed', 'us', color='orange', log=True, visualisation=viz)
+plotCategoryTimeSeriesByCountryFromAPI('Confirmed', country, color='orange', log=True, visualisation=viz)
 ```
 
 
 
 
-![svg](docs/images/output_39_0.svg)
+![svg](docs/images/output_40_0.svg)
 
 
 
-We can also look at Deaths in this case in log format:
+We can also retrieve multiple categories for a country as follows.  We need to be careful here with the country in question as the way the graph is being plotted only allows for 5000 rows. 
 
 ```python
-plotCategoryByCountryFromAPI('Deaths', 'us', color='red', log=True, visualisation=viz)
+plotCategoriesTimeSeriesByCountryFromAPI(country, which)
 ```
 
 
 
 
-![svg](docs/images/output_41_0.svg)
+![svg](docs/images/output_42_0.svg)
+
+
+
+```python
+plotCategoriesTimeSeriesByCountryFromAPI(country, which, log=True)
+```
+
+
+
+
+![svg](docs/images/output_43_0.svg)
 
 

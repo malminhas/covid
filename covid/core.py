@@ -5,8 +5,9 @@ __all__ = ['ALTAIR_W', 'ALTAIR_H', 'setDefaults', 'ROOT', 'CONFIRMED', 'DEATHS',
            'plotCountriesDailyReport', 'plotCountryDailyReport', 'getTimeSeriesConfirmed', 'getTimeSeriesDeaths',
            'getTimeSeriesRecovered', 'procTimeSeriesDataframe', 'procTimeSeries', 'procTimeSeriesDeaths',
            'procTimeSeriesConfirmed', 'procTimeSeriesRecovered', 'procNewCasesTimeSeries', 'plotCountriesTimeSeries',
-           'getCountriesDailyReportFromAPI', 'plotCountriesDailyReportFromAPI', 'getCategoryByCountryFromAPI',
-           'plotCategoryByCountryFromAPI']
+           'getCountriesDailyReportFromAPI', 'plotCountriesDailyReportFromAPI', 'getCategoryTimeSeriesByCountryFromAPI',
+           'plotCategoryTimeSeriesByCountryFromAPI', 'getCategoriesTimeSeriesByCountryFromAPI',
+           'plotCategoriesTimeSeriesByCountryFromAPI']
 
 # Cell
 import typing
@@ -228,7 +229,7 @@ def procNewCasesTimeSeries(df: pd.DataFrame, kind:str) -> pd.DataFrame:
 # Cell
 def plotCountriesTimeSeries(df: pd.DataFrame, countries: List, which: str, x: str, y: str,
                             grid: bool=True, log: bool=False, clampx: int=100, clampy: int=7,
-                            visualisation='matplotlib') -> None:
+                            useLoess: bool=False, visualisation='matplotlib') -> None:
     if visualisation == 'altair':
         sdf = df[df.country.isin(countries)]
         title = f'{y} by {x} in {countries} as of {which}'
@@ -236,7 +237,7 @@ def plotCountriesTimeSeries(df: pd.DataFrame, countries: List, which: str, x: st
             xval = 'day:T'
         else:
             if log:
-                xval = alt.X(f'{x}:Q', scale=alt.Scale(type='log', domain=(clampx, 30000)), axis=alt.Axis(tickCount=8))
+                xval = alt.X(f'{x}:Q', scale=alt.Scale(type='log'), axis=alt.Axis(tickCount=8))
                 sdf = sdf[sdf[x] > clampx]
             else:
                 xval = f'{x}:Q'
@@ -255,6 +256,8 @@ def plotCountriesTimeSeries(df: pd.DataFrame, countries: List, which: str, x: st
             height=ALTAIR_H,
             title=title
         )
+        if useLoess:
+            line_chart = line_chart.transform_loess(x, y, groupby=['country']).mark_line()
         if not grid:
             line_chart = removeGrid(line_chart)
         return line_chart
@@ -316,9 +319,9 @@ def plotCountriesDailyReportFromAPI(normalised=False, grid: bool=True, visualisa
         return bar_chart
     else: # matplotlib
         _ = sdf[sdf.TotalDeaths > cutoff].plot(kind='bar', x='Country', y=target,\
-          color=targetColors, stacked=True, figsize=(18, 9)).set_title('Covid-19 cases and deaths', size=18)
+          color=targetColors, stacked=True, figsize=(18, 9)).set_title('Covid-19 cases and deaths from CovidAPI', size=18)
 
-def getCategoryByCountryFromAPI(category: str, country: str, color: str) ->  pd.DataFrame:
+def getCategoryTimeSeriesByCountryFromAPI(category: str, country: str, color: str) ->  pd.DataFrame:
     url = f'https://api.covid19api.com/total/country/{country}/status/{category.lower()}'
     sdf = pd.DataFrame(requests.get(url).json())
     sdf['Date'] = sdf['Date'].apply(pd.to_datetime)
@@ -326,9 +329,9 @@ def getCategoryByCountryFromAPI(category: str, country: str, color: str) ->  pd.
     sdf[f'Log{category}'] = np.log(sdf[category])
     return sdf
 
-def plotCategoryByCountryFromAPI(category:str, country:str, color: str='orange', log: bool=False,
+def plotCategoryTimeSeriesByCountryFromAPI(category:str, country:str, color: str='orange', log: bool=False,
                                  grid: bool=True, visualisation: str='matplotlib') -> None:
-    sdf = getCategoryByCountryFromAPI(category, country, color)
+    sdf = getCategoryTimeSeriesByCountryFromAPI(category, country, color)
     if log:
         category = f'Log{category}'
     if visualisation == 'altair':
@@ -346,4 +349,50 @@ def plotCategoryByCountryFromAPI(category:str, country:str, color: str='orange',
         return line_chart
     else: # matplotlib
         sdf.plot(kind='line', x='Date', y=category, color=color, figsize=(18, 9)).\
-          set_title(f'Covid-19 {category} in {country}', size=18)
+          set_title(f'Covid-19 {category} in {country} from CovidAPI', size=18)
+
+def getCategoriesTimeSeriesByCountryFromAPI(country: str, categories: List=['confirmed','deaths','recovered']) ->  pd.DataFrame:
+    dfs = []
+    targetColors = ['orange','red','green']
+    for category in categories:
+        url = f'https://api.covid19api.com/dayone/country/{country}/status/{category}'
+        df = pd.DataFrame(requests.get(url).json())
+        df['Date'] = df['Date'].apply(pd.to_datetime)
+        dfs.append(df)
+    df = pd.concat(dfs)
+    df.sort_values(by=['Date'], inplace=True, ascending=True)
+    #
+    r = []
+    rows = df.groupby(['Date','Status'])['Cases'].sum().keys().to_list()
+    vals = df.groupby(['Date','Status'])['Cases'].sum().to_list()
+    for i,row in enumerate(rows):
+        dt = str(row[0]).split(' ')[0]
+        r.append({'Date': dt, 'Status': row[1], 'Count': vals[i]})
+    sdf = pd.DataFrame(r)
+    sdf['Date'] = sdf['Date'].apply(pd.to_datetime)
+    return sdf
+
+def plotCategoriesTimeSeriesByCountryFromAPI(country: str, which: str, categories: List=['confirmed','deaths','recovered'],
+                                             log: bool=False, grid: str=True) -> None:
+    df = getCategoriesTimeSeriesByCountryFromAPI(country, categories)
+    targetColors = ['orange','red','green']
+    if log:
+        yval = alt.Y(f'Count:Q', scale=alt.Scale(type='log'), axis=alt.Axis(tickCount=8))
+    else:
+        yval = alt.Y(f'Count:Q')
+    line_chart = alt.Chart(df[df.Count > 5]).mark_line().encode(
+        x=alt.X('Date:T'),
+        y=yval,
+        color = alt.Color('Status:N',
+            scale = alt.Scale(domain=categories, range=targetColors),
+            legend = alt.Legend(title="Category")
+        ),
+        opacity=alt.value(0.9)
+    ).properties(
+        width=800,
+        height=400,
+        title=f'Covid-19 time series of {categories} in {country} as of {which} from CovidAPI'
+    )
+    if not grid:
+        line_chart = removeGrid(line_chart)
+    return line_chart
