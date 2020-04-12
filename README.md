@@ -45,13 +45,13 @@ print(f'First {n} rows are:')
 print(df.iloc[:n,:])
 ```
 
-    df has 2809 rows and 12 columns with column names ['FIPS', 'Admin2', 'Province_State', 'Country_Region', 'Last_Update', 'Lat', 'Long_', 'Confirmed', 'Deaths', 'Recovered', 'Active', 'Combined_Key']
+    df has 2966 rows and 12 columns with column names ['FIPS', 'Admin2', 'Province_State', 'Country_Region', 'Last_Update', 'Lat', 'Long_', 'Confirmed', 'Deaths', 'Recovered', 'Active', 'Combined_Key']
     First 1 rows are:
           FIPS     Admin2  Province_State Country_Region         Last_Update  \
-    0  45001.0  Abbeville  South Carolina             US 2020-04-06 23:22:15   
+    0  45001.0  Abbeville  South Carolina             US 2020-04-11 22:45:33   
     
              Lat      Long_  Confirmed  Deaths  Recovered  Active  \
-    0  34.223334 -82.461707          6       0          0       0   
+    0  34.223334 -82.461707          9       0          0       0   
     
                         Combined_Key  
     0  Abbeville, South Carolina, US  
@@ -99,8 +99,8 @@ ddf = df.groupby('country')['Confirmed'].count().sort_values(ascending=True)
 print(f'max={ddf.max()}, min={ddf.min()}, count={len(ddf)}')
 ```
 
-    Found (13984, 4) (rows, cols) of cols=['day' 'country' 'Confirmed' 'LogConfirmed']
-    max=76, min=76, count=184
+    Found (14985, 4) (rows, cols) of cols=['day' 'country' 'Confirmed' 'LogConfirmed']
+    max=81, min=81, count=185
 
 
 Now we can plot a time series of confirmed cases of Covid-19 in China, Italy, US and UK as follows:
@@ -210,6 +210,8 @@ plotCountriesTimeSeries(ndf, countries, which, x='Deaths', y='New', clampx=100, 
 
 
 
+Finally we can apply `loess` [local regression](https://en.wikipedia.org/wiki/Local_regression) to smooth these curves to produce the kind of graphic that you see in print and online media:
+
 ```python
 plotCountriesTimeSeries(ndf, countries, which, x='Deaths', y='New', clampx=100, clampy=5, 
                         log=True, useLoess=True, grid=True, visualisation=viz)
@@ -218,7 +220,7 @@ plotCountriesTimeSeries(ndf, countries, which, x='Deaths', y='New', clampx=100, 
 
 
 
-![svg](docs/images/output_32_0.svg)
+![svg](docs/images/output_33_0.svg)
 
 
 
@@ -234,7 +236,7 @@ plotCountriesDailyReportFromAPI(visualisation=viz)
 
 
 
-![svg](docs/images/output_35_0.svg)
+![svg](docs/images/output_36_0.svg)
 
 
 
@@ -250,7 +252,7 @@ plotCategoryTimeSeriesByCountryFromAPI('Confirmed', country, color='orange', vis
 
 
 
-![svg](docs/images/output_38_0.svg)
+![svg](docs/images/output_39_0.svg)
 
 
 
@@ -263,11 +265,11 @@ plotCategoryTimeSeriesByCountryFromAPI('Confirmed', country, color='orange', log
 
 
 
-![svg](docs/images/output_40_0.svg)
+![svg](docs/images/output_41_0.svg)
 
 
 
-We can also retrieve multiple categories for a country as follows.  We need to be careful here with the country in question as the way the graph is being plotted only allows for 5000 rows. 
+We can also retrieve multiple categories for a country as follows again for the UK:
 
 ```python
 plotCategoriesTimeSeriesByCountryFromAPI(country, which)
@@ -276,9 +278,11 @@ plotCategoriesTimeSeriesByCountryFromAPI(country, which)
 
 
 
-![svg](docs/images/output_42_0.svg)
+![svg](docs/images/output_43_0.svg)
 
 
+
+Here's that same data on a log scale:
 
 ```python
 plotCategoriesTimeSeriesByCountryFromAPI(country, which, log=True)
@@ -287,6 +291,19 @@ plotCategoriesTimeSeriesByCountryFromAPI(country, which, log=True)
 
 
 
-![svg](docs/images/output_43_0.svg)
+![svg](docs/images/output_45_0.svg)
+
+
+
+Finally let's look at the data for the US from the Covid API:
+
+```python
+plotCategoriesTimeSeriesByCountryFromAPI('united-states', which, log=True)
+```
+
+
+
+
+![svg](docs/images/output_47_0.svg)
 
 
