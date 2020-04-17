@@ -45,13 +45,13 @@ print(f'First {n} rows are:')
 print(df.iloc[:n,:])
 ```
 
-    df has 2966 rows and 12 columns with column names ['FIPS', 'Admin2', 'Province_State', 'Country_Region', 'Last_Update', 'Lat', 'Long_', 'Confirmed', 'Deaths', 'Recovered', 'Active', 'Combined_Key']
+    df has 3042 rows and 12 columns with column names ['FIPS', 'Admin2', 'Province_State', 'Country_Region', 'Last_Update', 'Lat', 'Long_', 'Confirmed', 'Deaths', 'Recovered', 'Active', 'Combined_Key']
     First 1 rows are:
           FIPS     Admin2  Province_State Country_Region         Last_Update  \
-    0  45001.0  Abbeville  South Carolina             US 2020-04-11 22:45:33   
+    0  45001.0  Abbeville  South Carolina             US 2020-04-16 23:30:51   
     
              Lat      Long_  Confirmed  Deaths  Recovered  Active  \
-    0  34.223334 -82.461707          9       0          0       0   
+    0  34.223334 -82.461707         10       0          0      10   
     
                         Combined_Key  
     0  Abbeville, South Carolina, US  
@@ -99,8 +99,8 @@ ddf = df.groupby('country')['Confirmed'].count().sort_values(ascending=True)
 print(f'max={ddf.max()}, min={ddf.min()}, count={len(ddf)}')
 ```
 
-    Found (14985, 4) (rows, cols) of cols=['day' 'country' 'Confirmed' 'LogConfirmed']
-    max=81, min=81, count=185
+    Found (15910, 4) (rows, cols) of cols=['day' 'country' 'Confirmed' 'LogConfirmed']
+    max=86, min=86, count=185
 
 
 Now we can plot a time series of confirmed cases of Covid-19 in China, Italy, US and UK as follows:

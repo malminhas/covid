@@ -351,7 +351,7 @@ def plotCategoryTimeSeriesByCountryFromAPI(category:str, country:str, color: str
         sdf.plot(kind='line', x='Date', y=category, color=color, figsize=(18, 9)).\
           set_title(f'Covid-19 {category} in {country} from CovidAPI', size=18)
 
-def getCategoriesTimeSeriesByCountryFromAPI(country: str, categories: List=['confirmed','deaths','recovered']) ->  pd.DataFrame:
+def getCategoriesTimeSeriesByCountryFromAPI(country: str, which: str, categories: List=['confirmed','deaths','recovered']) ->  pd.DataFrame:
     dfs = []
     targetColors = ['orange','red','green']
     for category in categories:
@@ -370,11 +370,11 @@ def getCategoriesTimeSeriesByCountryFromAPI(country: str, categories: List=['con
         r.append({'Date': dt, 'Status': row[1], 'Count': vals[i]})
     sdf = pd.DataFrame(r)
     sdf['Date'] = sdf['Date'].apply(pd.to_datetime)
-    return sdf
+    return sdf[sdf['Date'] <= datetime.datetime.strptime(which, '%m-%d-%Y')]
 
 def plotCategoriesTimeSeriesByCountryFromAPI(country: str, which: str, categories: List=['confirmed','deaths','recovered'],
                                              log: bool=False, grid: str=True) -> None:
-    df = getCategoriesTimeSeriesByCountryFromAPI(country, categories)
+    df = getCategoriesTimeSeriesByCountryFromAPI(country, which, categories)
     targetColors = ['orange','red','green']
     if log:
         yval = alt.Y(f'Count:Q', scale=alt.Scale(type='log'), axis=alt.Axis(tickCount=8))
